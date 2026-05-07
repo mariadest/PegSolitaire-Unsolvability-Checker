@@ -27,7 +27,7 @@ class PegSolitaireGUI:
             bg="white",
             highlightthickness=0,   # border around canvas
         )
-        self.canvas.pack(padx=20, pady=20)  # in pixels 
+        self.canvas.pack(padx=20, pady=20) 
 
         # calls 'handle_click' when the left mouse button is pressed
         self.canvas.bind("<Button-1>", self.handle_click)   

@@ -4,10 +4,6 @@ class Operator:
         self.pre = pre
         self.eff = eff
 
-    # prints out an operator (mainly used for debugging)
-    def __repr__(self):
-        return f"Operator: name={self.name}, pre={self.pre}, eff={self.eff}"
-
 
 class PegSolitaireTask:
     def __init__(self, board_cells, operators, initial_state, goal_state):
