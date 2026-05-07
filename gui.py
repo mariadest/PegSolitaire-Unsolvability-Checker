@@ -9,15 +9,17 @@ class PegSolitaireGUI:
     PEG_RADIUS = 22     # pixel radius of pegs
 
     def __init__(self, root, on_ok):
-        self.root = root    # tkinter window
-        self.on_ok = on_ok  # the ok button
+        self.root = root   
+        self.on_ok = on_ok  
 
         self.root.title("Partial Peg Solitaire Unsolvability Checker")
 
         self.board_cells = get_english_board_cells()
         self.board_cells_set = set(self.board_cells)
-
+        
         self.state = self.make_default_state()  # we always start in the classic start configuration
+        
+        self.marked_cells = set()
 
         # the actual 'canvas' where stuff is drawn
         self.canvas = tk.Canvas(
@@ -29,8 +31,7 @@ class PegSolitaireGUI:
         )
         self.canvas.pack(padx=20, pady=20) 
 
-        # calls 'handle_click' when the left mouse button is pressed
-        self.canvas.bind("<Button-1>", self.handle_click)   
+        self.canvas.bind("<Button-1>", self.handle_click)   # calls handle_clik on left mouse button click
 
         # frame for buttons, we can reuse this if we add more later (don't think it's necessary though)
         button_frame = tk.Frame(root)
@@ -91,14 +92,18 @@ class PegSolitaireGUI:
                 x2 = x1 + self.CELL_SIZE
                 y2 = y1 + self.CELL_SIZE
 
+                cell_fill = "#fff4a3" if cell in self.marked_cells else "#ffffff"
+                cell_outline = "#d62828" if cell in self.marked_cells else "#000000"
+                cell_width = 4 if cell in self.marked_cells else 2
+
                 self.canvas.create_rectangle(
                     x1,
                     y1,
                     x2,
                     y2,
-                    fill="#ffffff",
-                    outline="#000000",
-                    width=2,
+                    fill=cell_fill,
+                    outline=cell_outline,
+                    width=cell_width,
                 )
 
                 # get center of the square
@@ -132,6 +137,8 @@ class PegSolitaireGUI:
 
         if cell not in self.board_cells_set:
             return
+        
+        self.marked_cells = set()
 
         if self.state[cell] == PEG:
             self.state[cell] = EMPTY
@@ -166,4 +173,19 @@ class PegSolitaireGUI:
 
     def reset_board(self):
         self.state = self.make_default_state()
+        self.marked_cells = set()
+        self.draw_board()
+        
+    def show_marked_cells(self, marked_cells):
+        """
+        Show the cells that were marked by the unsolvability proof.
+        """
+        self.marked_cells = set(marked_cells)
+        self.draw_board()
+
+    def clear_marked_cells(self):
+        """
+        Removes all cell markings
+        """
+        self.marked_cells = set()
         self.draw_board()

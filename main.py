@@ -45,7 +45,7 @@ def print_state(task):
         print(line)
 
 
-def handle_gui_ok(initial_state):
+def handle_gui_ok(gui, initial_state):
     task = build_task_from_gui_configuration(initial_state)
 
     print("Created a Peg Solitaire game!")
@@ -53,35 +53,43 @@ def handle_gui_ok(initial_state):
     print_state(task)
 
     # check for unsolvability with 1D features
-    '''proof_1d = find_1d_unsolvability_proof(task)
+    proof_1d = find_1d_unsolvability_proof(task)
 
     if proof_1d is not None:
-        print("Unsolvability proof found with one-dimensional F_2 features!")
+        print("Unsolvability proof found with 1D features")
         print("Marked cells:", proof_1d["marked_cells"])
+        print("-----------------------------------------------------")
+        
+        gui.show_marked_cells(proof_1d["marked_cells"])
 
         messagebox.showinfo(
             "We found a proof!",
             "An unsolvability proof was found using one-dimensional parity features :) / :(",
         )
     else:
+        print("No unsolvability proof was found.")
+        print("-----------------------------------------------------")
         messagebox.showinfo(
             "We failed.",
             "No proof for unsolvability has been found, time to try for yourself (>ᴗ•)!",
-        )'''
-
-    # TODO: check for unsolvability with 2D features
+        )
     
     
-    # TODO (optional): include Beasley argument checks
+    # TODO: include Beasley argument checks
 
 
 def main():
     root = tk.Tk()
 
-    PegSolitaireGUI(
+    gui = PegSolitaireGUI(
         root=root,
-        on_ok=handle_gui_ok,
+        on_ok=None,
     )
+    
+    def handle_ok_from_gui(initial_state):
+        handle_gui_ok(gui, initial_state)
+
+    gui.on_ok = handle_ok_from_gui
 
     root.mainloop()
 

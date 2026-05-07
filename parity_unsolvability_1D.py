@@ -14,6 +14,41 @@ def make_vector(cells, index, n):
         vector[index[cell]] = 1
     return GF(vector)
 
+def solve_linear_system(A, b):
+    """
+    Solves A*w=b and return w.
+    This is done over the field F2.
+    """
+    # convert into matrix and column vector over field F2
+    A = GF(np.array(A))
+    b = GF(np.array(b).reshape(-1, 1))
+
+    R = np.concatenate([A, b], axis=1).row_reduce()
+    num_cols = A.shape[1]
+
+    # checks for contradictions (0 = 1) to see if the system of equations is unsolvable
+    for row in R:
+        left = row[:num_cols]   
+        right = row[num_cols]   
+        
+        if np.all(left == 0) and right == 1:
+            return None
+
+    # Extract one solution. We set all free variables to 0.
+    w = GF.Zeros(num_cols)
+    for row in R:
+        left = row[:num_cols]
+        right = row[num_cols]
+        nonzero_columns = np.nonzero(left)[0]
+
+        if len(nonzero_columns) == 0:
+            continue
+
+        pivot_column = nonzero_columns[0]
+        w[pivot_column] = right
+
+    return w
+
 def find_1d_unsolvability_proof(task):
     """
     Finds a weight function w for the separating function.
@@ -45,4 +80,24 @@ def find_1d_unsolvability_proof(task):
     b = [0] * len(A)
     b[0] = 1    # the first equation should equal to 1 instead of 0, i.e. parity of initial and goal state differ (as defined in (6))
     
-    # actually find w
+    # do the actual solving
+    w = solve_linear_system(A, b)
+    
+    # no solution was found, i.e. we don't have an unsolvability proof
+    if w is None:
+        return None
+    
+    # read out the marked_cells 
+    marked_cells = []
+    weights = {}
+    for cell in cells:
+        weight = int(w[index[cell]])
+        weights[cell] = weight
+        
+        if weight == 1:
+            marked_cells.append(cell)
+    
+    return {
+        "method": "1d features",
+        "marked_cells": marked_cells,
+    }
