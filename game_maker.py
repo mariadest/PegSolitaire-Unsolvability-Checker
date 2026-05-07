@@ -47,6 +47,8 @@ def get_english_board_cells():
 #     MAKING INITIAL STATES       #
 # ------------------------------- # 
 # should be done over GUI at some point
+
+# NOT NEEDED WITH GUI ANYMORE
 def make_classic_initial_state():
     """
     This defines the standard start configuration of Peg Solitaire where all cells have a peg except the center one.
@@ -114,12 +116,14 @@ def generate_operators(board_cells):
     board_cells_set = set(board_cells)
     operators = []
 
+    # adds an operator for every possible jump on the board, going cell by cell
     for row, col in board_cells:
         for d_row, d_col in directions:
             from_cell = (row, col)
             over_cell = (row + d_row, col + d_col)
             to_cell = (row + 2 * d_row, col + 2 * d_col)
 
+            # check that all cells are actually valid cells and then add the operator
             if over_cell in board_cells_set and to_cell in board_cells_set:
                 name = f"jump_{from_cell}_over_{over_cell}_to_{to_cell}"
 
