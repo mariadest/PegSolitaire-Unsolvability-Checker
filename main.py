@@ -69,9 +69,13 @@ def handle_gui_ok(gui, initial_state):
     else:
         print("No unsolvability proof was found.")
         print("-----------------------------------------------------")
+
+        gui.enable_try_it()
+
         messagebox.showinfo(
             "We failed.",
-            "No proof for unsolvability has been found, time to try for yourself (>ᴗ•)!",
+            "We could not find a proof :("
+            "Guess you have to try it for yourself (>ᴗ•)!",
         )
     
     

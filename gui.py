@@ -20,6 +20,8 @@ class PegSolitaireGUI:
         self.state = self.make_default_state()  # we always start in the classic start configuration
         
         self.marked_cells = set()
+        self.play_mode = False
+        self.selected_cell = None
 
         # the actual 'canvas' where stuff is drawn
         self.canvas = tk.Canvas(
@@ -54,6 +56,24 @@ class PegSolitaireGUI:
             command=self.reset_board,
         )
         reset_button.pack(side=tk.LEFT, padx=5)
+        
+        self.try_it_button = tk.Button(
+            button_frame,
+            text="TRY IT",
+            width=12,
+            command=self.start_try_it_mode,
+            state=tk.DISABLED,
+        )
+        self.try_it_button.pack(side=tk.LEFT, padx=5)
+        
+        self.stop_trying_button = tk.Button(
+            button_frame,
+            text="STOP TRYING",
+            width=12,
+            command=self.stop_try_it_mode,
+            state=tk.DISABLED,
+        )
+        self.stop_trying_button.pack(side=tk.LEFT, padx=5)
 
         self.draw_board()
 
@@ -92,9 +112,18 @@ class PegSolitaireGUI:
                 x2 = x1 + self.CELL_SIZE
                 y2 = y1 + self.CELL_SIZE
 
-                cell_fill = "#fff4a3" if cell in self.marked_cells else "#ffffff"
-                cell_outline = "#d62828" if cell in self.marked_cells else "#000000"
-                cell_width = 4 if cell in self.marked_cells else 2
+                if cell == self.selected_cell:
+                    cell_fill = "#c8f7c5"
+                    cell_outline = "#168aad"
+                    cell_width = 4
+                elif cell in self.marked_cells:
+                    cell_fill = "#fff4a3"
+                    cell_outline = "#d62828"
+                    cell_width = 4
+                else:
+                    cell_fill = "#ffffff"
+                    cell_outline = "#000000"
+                    cell_width = 2
 
                 self.canvas.create_rectangle(
                     x1,
@@ -129,7 +158,8 @@ class PegSolitaireGUI:
 
     def handle_click(self, event):
         """
-        Removes or adds a peg if we click on a cell 
+        In setup mode: removes or adds a peg if we click on a cell.
+        In play mode: lets the user play Peg Solitaire.
         """
         col = event.x // self.CELL_SIZE
         row = event.y // self.CELL_SIZE
@@ -137,8 +167,14 @@ class PegSolitaireGUI:
 
         if cell not in self.board_cells_set:
             return
-        
+
+        if self.play_mode:
+            self.handle_play_click(cell)
+            return
+
+        # setup mode
         self.marked_cells = set()
+        self.disable_try_it()
 
         if self.state[cell] == PEG:
             self.state[cell] = EMPTY
@@ -159,7 +195,7 @@ class PegSolitaireGUI:
         if peg_count == 0:
             messagebox.showwarning(
                 "You can't do that:",
-                "Please select at least one peg!",
+                "This is just an empty board and not a game.",
             )
             return
 
@@ -172,8 +208,15 @@ class PegSolitaireGUI:
         return dict(self.state)
 
     def reset_board(self):
+        """
+        resets everything back to the initial state and sets TRY IT mode off
+        """
         self.state = self.make_default_state()
         self.marked_cells = set()
+        self.play_mode = False
+        self.selected_cell = None
+        self.disable_try_it()
+        self.disable_stop_trying()
         self.draw_board()
         
     def show_marked_cells(self, marked_cells):
@@ -188,4 +231,177 @@ class PegSolitaireGUI:
         Removes all cell markings
         """
         self.marked_cells = set()
+        self.draw_board()
+        
+    
+    # ----------------------------- #
+    #   functions for TRY IT mode   #
+    # ----------------------------- #
+    def enable_try_it(self):
+        """
+        Enables the TRY IT button after no proof was found
+        """
+        self.try_it_button.config(state=tk.NORMAL)
+
+    def disable_try_it(self):
+        """
+        Disables the TRY IT button
+        """
+        self.try_it_button.config(state=tk.DISABLED)
+    
+    def enable_stop_trying(self):
+        """
+        Enables the STOP TRYING button while in TRY IT mode
+        """
+        self.stop_trying_button.config(state=tk.NORMAL)
+
+    def disable_stop_trying(self):
+        """
+        Disables the STOP TRYING button outside TRY IT mode
+        """
+        self.stop_trying_button.config(state=tk.DISABLED)
+
+
+    def start_try_it_mode(self):
+        """
+        Starts playable Peg Solitaire mode
+        """
+        self.play_mode = True
+        self.selected_cell = None
+        self.marked_cells = set()
+        self.disable_try_it()
+        self.enable_stop_trying()
+        self.draw_board()
+
+        messagebox.showinfo(
+            "Try it!",
+            "You can now play Peg Solitaire. Good luck in finding a solution! \n\n"
+            "(If there is one)"
+        )
+
+
+    def handle_play_click(self, cell):
+        """
+        Handles clicks while in TRY IT mode
+        """
+        # First click: select a peg
+        if self.selected_cell is None:
+            if self.state[cell] == PEG:
+                self.selected_cell = cell
+                self.draw_board()
+            return
+
+        # Clicking the selected peg again deselects it
+        if cell == self.selected_cell:
+            self.selected_cell = None
+            self.draw_board()
+            return
+
+        # Second click: choose cell to move to
+        from_cell = self.selected_cell
+        to_cell = cell
+
+        if self.is_valid_move(from_cell, to_cell):
+            self.apply_move(from_cell, to_cell)
+            self.selected_cell = None
+            self.draw_board()
+            self.check_game_end()
+        else:
+            self.selected_cell = None
+            self.draw_board()
+
+
+    def is_valid_move(self, from_cell, to_cell):
+        """
+        Checks if the move we want to do is legal
+        """
+        if self.state[from_cell] != PEG:
+            return False
+
+        if self.state[to_cell] != EMPTY:
+            return False
+
+        from_row, from_col = from_cell
+        to_row, to_col = to_cell
+
+        row_diff = to_row - from_row
+        col_diff = to_col - from_col
+
+        # Move must be exactly two cells horizontally or vertically
+        valid_vertical_jump = abs(row_diff) == 2 and col_diff == 0
+        valid_horizontal_jump = abs(col_diff) == 2 and row_diff == 0
+
+        if not (valid_vertical_jump or valid_horizontal_jump):
+            return False
+
+        jumped_cell = (
+            from_row + row_diff // 2,
+            from_col + col_diff // 2,
+        )
+
+        if jumped_cell not in self.board_cells_set:
+            return False
+
+        if self.state[jumped_cell] != PEG:
+            return False
+
+        return True
+
+
+    def apply_move(self, from_cell, to_cell):
+        """
+        Applies a valid Peg Solitaire move, i.e. the peg jumps and the jumped over one gets removed
+        """
+        from_row, from_col = from_cell
+        to_row, to_col = to_cell
+
+        jumped_cell = (
+            from_row + (to_row - from_row) // 2,
+            from_col + (to_col - from_col) // 2,
+        )
+
+        self.state[from_cell] = EMPTY
+        self.state[jumped_cell] = EMPTY
+        self.state[to_cell] = PEG
+
+
+    def check_game_end(self):
+        """
+        Checks whether the game has ended.
+        """
+        peg_cells = [
+            cell for cell, value in self.state.items()
+            if value == PEG
+        ]
+
+        # Game only ends when there is one peg left
+        if len(peg_cells) == 1:
+            final_cell = peg_cells[0]
+
+            if final_cell == (3, 3):
+                messagebox.showinfo(
+                    "You solved it!",
+                    "You ended with one peg in the center. Nice!",
+                )
+            else:
+                messagebox.showinfo(
+                    "One peg left",
+                    f"You ended with one peg at {final_cell}, but not in the center.",
+                )
+
+            self.play_mode = False
+            self.selected_cell = None
+            self.disable_stop_trying()
+            self.enable_try_it()
+            self.draw_board()
+            
+            
+    def stop_try_it_mode(self):
+        """
+        Returns to setup mode
+        """
+        self.play_mode = False
+        self.selected_cell = None
+        self.disable_stop_trying()
+        self.enable_try_it()
         self.draw_board()
