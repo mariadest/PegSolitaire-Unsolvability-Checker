@@ -46,9 +46,7 @@ def get_english_board_cells():
 # ------------------------------- # 
 #     MAKING INITIAL STATES       #
 # ------------------------------- # 
-# should be done over GUI at some point
-
-# NOT NEEDED WITH GUI ANYMORE
+# TECHNICALLY NOT NEEDED WITH GUI ANYMORE
 def make_classic_initial_state():
     """
     This defines the standard start configuration of Peg Solitaire where all cells have a peg except the center one.

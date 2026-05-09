@@ -1,5 +1,3 @@
-# resource_unsolvability_1D.py
-
 import numpy as np
 from scipy.optimize import linprog
 

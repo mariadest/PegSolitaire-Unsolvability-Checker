@@ -42,7 +42,7 @@ def print_state(task):
         print(line)
 
 
-def handle_gui_ok(gui, initial_state):
+def handle_gui_check(gui, initial_state):
     task = build_task_from_gui_configuration(initial_state)
 
     print("Created a Peg Solitaire game!")
@@ -63,7 +63,7 @@ def handle_gui_ok(gui, initial_state):
 
         messagebox.showinfo(
             "We found a proof!",
-            "An unsolvability proof was found using one-dimensional parity features :) / :(",
+            "An unsolvability proof was found using one-dimensional features over F2.",
         )
     elif proof_resource is not None:
         print("Unsolvability proof found with resource count")
@@ -87,7 +87,7 @@ def handle_gui_ok(gui, initial_state):
 
         messagebox.showinfo(
             "We failed.",
-            "We could not find a proof :("
+            "We could not find a proof :( \n\n"
             "Guess you have to try for yourself.",
         )
         
@@ -100,13 +100,13 @@ def main():
 
     gui = PegSolitaireGUI(
         root=root,
-        on_ok=None,
+        on_check=None,
     )
     
-    def handle_ok_from_gui(initial_state):
-        handle_gui_ok(gui, initial_state)
+    def handle_check_from_gui(initial_state):
+        handle_gui_check(gui, initial_state)
 
-    gui.on_ok = handle_ok_from_gui
+    gui.on_check = handle_check_from_gui
 
     root.mainloop()
 

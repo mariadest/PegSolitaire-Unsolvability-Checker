@@ -8,11 +8,11 @@ class PegSolitaireGUI:
     CELL_SIZE = 70      # pixel size of cells
     PEG_RADIUS = 22     # pixel radius of pegs
 
-    def __init__(self, root, on_ok):
+    def __init__(self, root, on_check):
         self.root = root   
-        self.on_ok = on_ok  
+        self.on_check = on_check  
 
-        self.root.title("Partial Peg Solitaire Unsolvability Checker")
+        self.root.title("The (Partial) Peg Solitaire Unsolvability Checker")
 
         self.board_cells = get_english_board_cells()
         self.board_cells_set = set(self.board_cells)
@@ -32,7 +32,7 @@ class PegSolitaireGUI:
             root,
             width=7 * self.CELL_SIZE,
             height=7 * self.CELL_SIZE,
-            bg="white",
+            bg="#f4f6f8",
             highlightthickness=0,   # border around canvas
         )
         self.canvas.pack(padx=20, pady=20) 
@@ -43,19 +43,19 @@ class PegSolitaireGUI:
         button_frame = tk.Frame(root)
         button_frame.pack(pady=(0, 20))
 
-        # define the OK button
-        ok_button = tk.Button(
+        # define the CHECK button
+        check_button = tk.Button(
             button_frame,
-            text="OK",
+            text="Check",
             width=12,
-            command=self.handle_ok,
+            command=self.handle_check,
         )
-        ok_button.pack(side=tk.LEFT, padx=5)
+        check_button.pack(side=tk.LEFT, padx=5)
 
         # define the RESET button
         reset_button = tk.Button(
             button_frame,
-            text="RESET",
+            text="Reset Board",
             width=12,
             command=self.reset_board,
         )
@@ -63,14 +63,16 @@ class PegSolitaireGUI:
         
         self.clear_button = tk.Button(
             button_frame,
-            text="CLEAR",
+            text="Clear Board",
             width=12,
             command=self.clear_board,
         )
         
+        self.clear_button.pack(side=tk.LEFT, padx=5)
+        
         self.stop_trying_button = tk.Button(
             button_frame,
-            text="STOP TRYING",
+            text="Stop Trying",
             width=12,
             command=self.stop_try_it_mode,
             state=tk.DISABLED,
@@ -119,19 +121,19 @@ class PegSolitaireGUI:
                     cell_outline = "#1f91b4"
                     cell_width = 4
                 elif cell in self.positive_cells:
-                    cell_fill = "#a0ffc1"      # yellow
-                    cell_outline = "#086629"   # red
+                    cell_fill = "#b6ffcf"      # yellow
+                    cell_outline = "#2f8f57"   # red
                     cell_width = 4
                 elif cell in self.negative_cells:
-                    cell_fill = "#ff8484"      # light blue
-                    cell_outline = "#650707"   # dark blue
+                    cell_fill = "#ffb9b9"      # light blue
+                    cell_outline = "#b33a3a"   # dark blue
                     cell_width = 4
                 elif cell in self.marked_cells:
-                    cell_fill = "#faeca0"
-                    cell_outline = "#998512"
+                    cell_fill = "#fff3bf"
+                    cell_outline = "#c49a00"
                     cell_width = 4
                 else:
-                    cell_fill = "#ffffff"
+                    cell_fill = "#fdfdfd"
                     cell_outline = "#000000"
                     cell_width = 2
 
@@ -206,7 +208,7 @@ class PegSolitaireGUI:
 
         self.draw_board()
 
-    def handle_ok(self):
+    def handle_check(self):
         """
         Checks that there was at least 1 peg selected and sends the current board config to main
         """
@@ -222,7 +224,7 @@ class PegSolitaireGUI:
             )
             return
 
-        self.on_ok(self.get_state())    # take the current state from the gui and give it to the OK function
+        self.on_check(self.get_state())    # take the current state from the gui and give it to the CHECK function
 
     def get_state(self):
         """
@@ -421,7 +423,7 @@ class PegSolitaireGUI:
             else:
                 messagebox.showinfo(
                     "Congratulation?",
-                    "You ended up with one Peg! \n\n",
+                    "You ended up with one Peg! \n\n"
                     "But it's not in the correct position :/"
                 )
 
