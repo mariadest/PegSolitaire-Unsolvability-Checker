@@ -20,6 +20,10 @@ class PegSolitaireGUI:
         self.state = self.make_default_state()  # we always start in the classic start configuration
         
         self.marked_cells = set()
+        self.positive_cells = set()
+        self.negative_cells = set()
+        self.resource_weights = {}
+        
         self.play_mode = False
         self.selected_cell = None
 
@@ -57,14 +61,12 @@ class PegSolitaireGUI:
         )
         reset_button.pack(side=tk.LEFT, padx=5)
         
-        self.try_it_button = tk.Button(
+        self.clear_button = tk.Button(
             button_frame,
-            text="TRY IT",
+            text="CLEAR",
             width=12,
-            command=self.start_try_it_mode,
-            state=tk.DISABLED,
+            command=self.clear_board,
         )
-        self.try_it_button.pack(side=tk.LEFT, padx=5)
         
         self.stop_trying_button = tk.Button(
             button_frame,
@@ -113,12 +115,20 @@ class PegSolitaireGUI:
                 y2 = y1 + self.CELL_SIZE
 
                 if cell == self.selected_cell:
-                    cell_fill = "#c8f7c5"
-                    cell_outline = "#168aad"
+                    cell_fill = "#b0ceef"
+                    cell_outline = "#1f91b4"
+                    cell_width = 4
+                elif cell in self.positive_cells:
+                    cell_fill = "#a0ffc1"      # yellow
+                    cell_outline = "#086629"   # red
+                    cell_width = 4
+                elif cell in self.negative_cells:
+                    cell_fill = "#ff8484"      # light blue
+                    cell_outline = "#650707"   # dark blue
                     cell_width = 4
                 elif cell in self.marked_cells:
-                    cell_fill = "#fff4a3"
-                    cell_outline = "#d62828"
+                    cell_fill = "#faeca0"
+                    cell_outline = "#998512"
                     cell_width = 4
                 else:
                     cell_fill = "#ffffff"
@@ -155,12 +165,26 @@ class PegSolitaireGUI:
                     outline=outline,
                     width=2,
                 )
+                
+                # Show the resource-count weights in the cells (if there are some)
+                if cell in self.resource_weights:
+                    weight = self.resource_weights[cell]
+                    self.canvas.create_text(
+                        center_x,
+                        center_y,
+                        text=self.format_weight(weight),
+                        anchor="center",
+                        fill="#000000",
+                        font=("Arial", 12, "bold"),
+                    )
 
     def handle_click(self, event):
         """
         In setup mode: removes or adds a peg if we click on a cell.
         In play mode: lets the user play Peg Solitaire.
         """
+        self.clear_marked_cells()
+        
         col = event.x // self.CELL_SIZE
         row = event.y // self.CELL_SIZE
         cell = (row, col)
@@ -174,7 +198,6 @@ class PegSolitaireGUI:
 
         # setup mode
         self.marked_cells = set()
-        self.disable_try_it()
 
         if self.state[cell] == PEG:
             self.state[cell] = EMPTY
@@ -213,17 +236,35 @@ class PegSolitaireGUI:
         """
         self.state = self.make_default_state()
         self.marked_cells = set()
+        self.positive_cells = set()
+        self.negative_cells = set()
+        self.resource_weights = {}
         self.play_mode = False
         self.selected_cell = None
-        self.disable_try_it()
         self.disable_stop_trying()
         self.draw_board()
         
     def show_marked_cells(self, marked_cells):
         """
-        Show the cells that were marked by the unsolvability proof.
+        highlights marked cells
         """
         self.marked_cells = set(marked_cells)
+        self.draw_board()
+        
+    def show_resource_cells(self, positive_cells, negative_cells, weights):
+        """
+        highlights positive and negative cells 
+        """
+        self.marked_cells = set()
+        self.positive_cells = set(positive_cells)
+        self.negative_cells = set(negative_cells)
+        
+        # draw non-zero weights
+        self.resource_weights = {}
+        for cell, weight in weights.items():
+            if abs(weight) > 1e-8:
+                self.resource_weights[cell] = weight
+                
         self.draw_board()
 
     def clear_marked_cells(self):
@@ -231,24 +272,15 @@ class PegSolitaireGUI:
         Removes all cell markings
         """
         self.marked_cells = set()
+        self.positive_cells = set()
+        self.negative_cells = set()
+        self.resource_weights = {}
         self.draw_board()
         
     
     # ----------------------------- #
     #   functions for TRY IT mode   #
     # ----------------------------- #
-    def enable_try_it(self):
-        """
-        Enables the TRY IT button after no proof was found
-        """
-        self.try_it_button.config(state=tk.NORMAL)
-
-    def disable_try_it(self):
-        """
-        Disables the TRY IT button
-        """
-        self.try_it_button.config(state=tk.DISABLED)
-    
     def enable_stop_trying(self):
         """
         Enables the STOP TRYING button while in TRY IT mode
@@ -262,22 +294,25 @@ class PegSolitaireGUI:
         self.stop_trying_button.config(state=tk.DISABLED)
 
 
-    def start_try_it_mode(self):
+    def start_try_it_mode(self, show_message=True):
         """
-        Starts playable Peg Solitaire mode
+        Starts playable Peg Solitaire mode.
         """
         self.play_mode = True
         self.selected_cell = None
         self.marked_cells = set()
-        self.disable_try_it()
+        self.positive_cells = set()
+        self.negative_cells = set()
+        self.resource_weights = {}
         self.enable_stop_trying()
         self.draw_board()
 
-        messagebox.showinfo(
-            "Try it!",
-            "You can now play Peg Solitaire. Good luck in finding a solution! \n\n"
-            "(If there is one)"
-        )
+        if show_message:
+            messagebox.showinfo(
+                "Try it!",
+                "You can now play Peg Solitaire. Good luck in finding a solution! \n\n"
+                "(If there is one)"
+            )
 
 
     def handle_play_click(self, cell):
@@ -380,28 +415,53 @@ class PegSolitaireGUI:
 
             if final_cell == (3, 3):
                 messagebox.showinfo(
-                    "You solved it!",
-                    "You ended with one peg in the center. Nice!",
+                    "Congratulation!",
+                    "You found a solution!",
                 )
             else:
                 messagebox.showinfo(
-                    "One peg left",
-                    f"You ended with one peg at {final_cell}, but not in the center.",
+                    "Congratulation?",
+                    "You ended up with one Peg! \n\n",
+                    "But it's not in the correct position :/"
                 )
 
             self.play_mode = False
             self.selected_cell = None
             self.disable_stop_trying()
-            self.enable_try_it()
             self.draw_board()
             
             
     def stop_try_it_mode(self):
         """
-        Returns to setup mode
+        Returns to regular mode
         """
         self.play_mode = False
         self.selected_cell = None
         self.disable_stop_trying()
-        self.enable_try_it()
+        self.draw_board()
+        
+    def format_weight(self, weight):
+        """
+        Format the weights of resource count to then display them on the board.
+        We keep 1 decimal place, otherwise it gets very clutterd.
+        """
+        # round when there are very very small differences
+        if abs(weight) < 1e-10:
+            return "0"
+        if abs(weight - round(weight)) < 1e-10:
+            return str(int(round(weight)))
+
+        return f"{weight:.1f}"
+    
+    def clear_board(self):
+        for cell in self.board_cells:
+            self.state[cell] = EMPTY
+
+        self.marked_cells = set()
+        self.positive_cells = set()
+        self.negative_cells = set()
+        self.resource_weights = {}
+        self.play_mode = False
+        self.selected_cell = None
+        self.disable_stop_trying()
         self.draw_board()

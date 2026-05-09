@@ -5,6 +5,7 @@ from gui import PegSolitaireGUI
 from game_maker import get_english_board_cells,generate_operators,make_single_peg_goal
 from peg_solitaire import PegSolitaireTask
 from parity_unsolvability_1D import find_1d_unsolvability_proof
+from resource_unsolvability import find_resource_unsolvability_proof
 
 def build_task_from_gui_configuration(initial_state, goal_cell=(3, 3)):
     """
@@ -21,10 +22,6 @@ def build_task_from_gui_configuration(initial_state, goal_cell=(3, 3)):
         initial_state=initial_state,
         goal_state=goal_state,
     )
-
-# TODO: make an option where we don't have to end with the peg in the middle cell but ANY cell
-# TODO: make an option where we can choose where the last peg should be
-
 
 def print_state(task):
     
@@ -54,6 +51,8 @@ def handle_gui_ok(gui, initial_state):
 
     # check for unsolvability with 1D features
     proof_1d = find_1d_unsolvability_proof(task)
+    # check for unsolvability with resource counts 
+    proof_resource = find_resource_unsolvability_proof(task)
 
     if proof_1d is not None:
         print("Unsolvability proof found with 1D features")
@@ -66,21 +65,35 @@ def handle_gui_ok(gui, initial_state):
             "We found a proof!",
             "An unsolvability proof was found using one-dimensional parity features :) / :(",
         )
+    elif proof_resource is not None:
+        print("Unsolvability proof found with resource count")
+        print("Initial resource:", proof_resource["initial_value"])
+        print("Goal resource:", proof_resource["goal_value"])
+        print("Positive cells:", proof_resource["positive_cells"])
+        print("Negative cells:", proof_resource["negative_cells"])
+        print("-----------------------------------------------------")
+
+        gui.show_resource_cells(proof_resource["positive_cells"], proof_resource["negative_cells"], proof_resource["weights"])
+        
+        messagebox.showinfo(
+            "We found a proof!",
+            "An unsolvability proof was found using resource-count.\n\n"
+            f"Initial resource: {proof_resource['initial_value']:.1f}\n"
+            f"Goal resource: {proof_resource['goal_value']:.1f}",
+        )
     else:
         print("No unsolvability proof was found.")
         print("-----------------------------------------------------")
 
-        gui.enable_try_it()
-
         messagebox.showinfo(
             "We failed.",
             "We could not find a proof :("
-            "Guess you have to try it for yourself (>ᴗ•)!",
+            "Guess you have to try for yourself.",
         )
+        
+        gui.start_try_it_mode(show_message=False)
     
     
-    # TODO: include Beasley argument checks
-
 
 def main():
     root = tk.Tk()
