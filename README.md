@@ -27,7 +27,7 @@ python3 main.py
 ```
 
 ## How to Use
-We always start in the classic English Peg Solitaire initial configuration where one Peg is missing in the middle (insert image). The goal is to end up with a single peg in the middle hole (position (3, 3)).  
+We always start in the classic English Peg Solitaire initial configuration where one Peg is missing in the middle. The goal is to end up with a single peg in the middle hole (position (3, 3)).  
 <img src="imgs/classic_initial_config.png" alt="middle hole" width="300">
 
 ### Setup  
