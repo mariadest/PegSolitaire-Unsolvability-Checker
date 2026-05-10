@@ -61,10 +61,13 @@ def handle_gui_check(gui, initial_state):
         
         gui.show_marked_cells(proof_1d["marked_cells"])
 
-        messagebox.showinfo(
+        '''messagebox.showinfo(
             "We found a proof!",
             "An unsolvability proof was found using one-dimensional features over F2.",
-        )
+        )''' 
+        
+        gui.status_label.config(text="An unsolvability proof was found using 1D features over F2! \n")
+        
     elif proof_resource is not None:
         print("Unsolvability proof found with resource count")
         print("Initial resource:", proof_resource["initial_value"])
@@ -75,21 +78,28 @@ def handle_gui_check(gui, initial_state):
 
         gui.show_resource_cells(proof_resource["positive_cells"], proof_resource["negative_cells"], proof_resource["weights"])
         
-        messagebox.showinfo(
+        """ messagebox.showinfo(
             "We found a proof!",
             "An unsolvability proof was found using resource-count.\n\n"
             f"Initial resource: {proof_resource['initial_value']:.1f}\n"
             f"Goal resource: {proof_resource['goal_value']:.1f}",
-        )
+        )"""
+        
+        gui.status_label.config(text="An unsolvability proof was found using resource count! \n"
+                                f"Initial resource: {proof_resource['initial_value']:.1f}             Goal resource: {proof_resource['goal_value']:.1f}",)
+
     else:
         print("No unsolvability proof was found.")
         print("-----------------------------------------------------")
 
-        messagebox.showinfo(
+        '''messagebox.showinfo(
             "We failed.",
-            "We could not find a proof :( \n\n"
-            "Guess you have to try for yourself.",
-        )
+            "We could not find a proof. \n\n"
+            "Guess you have to try for yourself :)",
+        )'''
+        
+        gui.status_label.config(text="We could not find a proof. \n Time to find out yourself :)")
+
         
         gui.start_try_it_mode(show_message=False)
     

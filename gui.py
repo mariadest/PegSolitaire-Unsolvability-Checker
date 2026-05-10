@@ -13,7 +13,7 @@ class PegSolitaireGUI:
         self.on_check = on_check  
 
         self.root.title("The (Partial) Peg Solitaire Unsolvability Checker")
-
+        
         self.board_cells = get_english_board_cells()
         self.board_cells_set = set(self.board_cells)
         
@@ -32,12 +32,22 @@ class PegSolitaireGUI:
             root,
             width=7 * self.CELL_SIZE,
             height=7 * self.CELL_SIZE,
-            bg="#f4f6f8",
+            bg = "#f0f0f0",
             highlightthickness=0,   # border around canvas
         )
         self.canvas.pack(padx=20, pady=20) 
 
         self.canvas.bind("<Button-1>", self.handle_click)   # calls handle_clik on left mouse button click
+        
+        self.status_label = tk.Label(
+            root,
+            text="\n",
+            font=("Segoe UI", 15),
+            width=55,
+            anchor="center",
+            fg="#242424",
+        )
+        self.status_label.pack(pady=(0, 10))
 
         # frame for buttons, we can reuse this if we add more later (don't think it's necessary though)
         button_frame = tk.Frame(root)
@@ -48,6 +58,7 @@ class PegSolitaireGUI:
             button_frame,
             text="Check",
             width=12,
+            font=("Segoe UI", 12),
             command=self.handle_check,
         )
         check_button.pack(side=tk.LEFT, padx=5)
@@ -57,6 +68,7 @@ class PegSolitaireGUI:
             button_frame,
             text="Reset Board",
             width=12,
+            font=("Segoe UI", 12),
             command=self.reset_board,
         )
         reset_button.pack(side=tk.LEFT, padx=5)
@@ -65,6 +77,7 @@ class PegSolitaireGUI:
             button_frame,
             text="Clear Board",
             width=12,
+            font=("Segoe UI", 12),
             command=self.clear_board,
         )
         
@@ -74,6 +87,7 @@ class PegSolitaireGUI:
             button_frame,
             text="Stop Trying",
             width=12,
+            font=("Segoe UI", 12),
             command=self.stop_try_it_mode,
             state=tk.DISABLED,
         )
@@ -120,6 +134,10 @@ class PegSolitaireGUI:
                     cell_fill = "#b0ceef"
                     cell_outline = "#1f91b4"
                     cell_width = 4
+                elif cell == (3, 3):
+                    cell_fill = "#ffffff"
+                    cell_outline = "#000000"
+                    cell_width = 4
                 elif cell in self.positive_cells:
                     cell_fill = "#b6ffcf"      # yellow
                     cell_outline = "#2f8f57"   # red
@@ -133,7 +151,7 @@ class PegSolitaireGUI:
                     cell_outline = "#c49a00"
                     cell_width = 4
                 else:
-                    cell_fill = "#fdfdfd"
+                    cell_fill = "#ffffff"
                     cell_outline = "#000000"
                     cell_width = 2
 
@@ -152,8 +170,8 @@ class PegSolitaireGUI:
                 center_y = y1 + self.CELL_SIZE // 2
 
                 if self.state[cell] == PEG:
-                    fill = "#2f6fed"
-                    outline = "#1d3f8f"
+                    fill = "#231195"
+                    outline = "#000733"
                 else:
                     fill = "#939393"
                     outline = "#939393"
@@ -177,7 +195,7 @@ class PegSolitaireGUI:
                         text=self.format_weight(weight),
                         anchor="center",
                         fill="#000000",
-                        font=("Arial", 12, "bold"),
+                        font=("Segoe UI", 12, "bold"),
                     )
 
     def handle_click(self, event):
@@ -186,17 +204,19 @@ class PegSolitaireGUI:
         In play mode: lets the user play Peg Solitaire.
         """
         self.clear_marked_cells()
-        
+
         col = event.x // self.CELL_SIZE
         row = event.y // self.CELL_SIZE
         cell = (row, col)
 
         if cell not in self.board_cells_set:
             return
-
+        
         if self.play_mode:
             self.handle_play_click(cell)
             return
+        
+        self.status_label.config(text="\n")
 
         # setup mode
         self.marked_cells = set()
@@ -243,6 +263,7 @@ class PegSolitaireGUI:
         self.resource_weights = {}
         self.play_mode = False
         self.selected_cell = None
+        self.status_label.config(text="\n")
         self.disable_stop_trying()
         self.draw_board()
         
@@ -426,6 +447,8 @@ class PegSolitaireGUI:
                     "You ended up with one Peg! \n\n"
                     "But it's not in the correct position :/"
                 )
+            
+            self.status_label.config(text="\n")
 
             self.play_mode = False
             self.selected_cell = None
@@ -465,5 +488,6 @@ class PegSolitaireGUI:
         self.resource_weights = {}
         self.play_mode = False
         self.selected_cell = None
+        self.status_label.config(text="\n")
         self.disable_stop_trying()
         self.draw_board()
