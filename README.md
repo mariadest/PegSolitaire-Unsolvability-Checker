@@ -42,5 +42,6 @@ The highlighted cells are the ones the weight function assigns a value of 1, i.e
 - **We find a proof using the resource-count based approach**.  
 The cells highlighted in green are the ones that get assigned a positive weight, the red cells get assigned a negative weight. Cells without a highlight have a weight of 0. The weights are also specified in each cell.  
 <img src="imgs/unsolvable_count.png" alt="middle hole" width="300">
-- **We cannot find a proof**.  
+
+- **We cannot find a proof**.    
 In this case we enter the *TRY IT* mode where the user can play Peg Solitaire starting from the given position. While playing we can use the `Check` button to check if we can still not find an unsolvability proof for the current position. If we do we either caused ourselves to end up in an unsolvable position or the previous position was in fact actually unsolvable. *TRY IT* mode can be deactivated by pressing the `Stop Trying` button.
