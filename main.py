@@ -98,7 +98,7 @@ def handle_gui_check(gui, initial_state):
             "Guess you have to try for yourself :)",
         )'''
         
-        gui.status_label.config(text="We could not find a proof. \n Time to find out yourself :)")
+        gui.status_label.config(text="We could not find a proof. \n Time to try it out yourself :)")
 
         
         gui.start_try_it_mode(show_message=False)
