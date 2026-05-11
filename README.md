@@ -30,7 +30,7 @@ python3 main.py
 ```
 
 ## How to Use
-We always start in the classic initial configuration where the center peg is missing, i.e. position (3, 3). The goal is to end up with a single peg in the center hole (3, 3).
+We always start in the classic initial configuration where the center peg is missing, i.e. position (3, 3). The goal is to end up with a single peg in the center hole (3, 3).  
 <img src="imgs/classic_initial_config.png" alt="middle hole" width="300">
 
 ### Setup  
