@@ -43,8 +43,8 @@ The highlighted cells are the ones the weight function (of the potential functio
 <img src="imgs/unsolvable_1d.png" alt="middle hole" width="300">
 
 - **We find a proof using the resource-count based approach**.  
-The cells highlighted in green are the ones that get assigned a positive weight, the red cells get assigned a negative weight. Cells without a highlight have a weight of 0. The weights are also specified in each cell. If the total weight of cells occupied by pegs in the intial configuration (*initial resource*) is smaller than the weight of center cell (*goal resource*), the problem is unsolvable.  
+The cells highlighted in green are the ones that get assigned a positive weight, the red cells get assigned a negative weight. Cells without a highlight have a weight of 0. The weights are also specified in each cell. If the total weight of cells occupied by pegs in the intial configuration (*initial resource*) is smaller than the weight of the center cell (*goal resource*), the problem is unsolvable.  
 <img src="imgs/unsolvable_count.png" alt="middle hole" width="300">
 
 - **We cannot find a proof**.    
-In this case we enter the *TRY IT* mode where the user can play Peg Solitaire starting from the given position. While playing the `Check` button can still be used. If a proof is found after playing for a while we either caused ourselves to end up in an unsolvable situation or the configuration we started in was unsolvable after all. *TRY IT* mode can be deactivated by pressing the `Stop Trying` button. This returns us to the *SETUP* mode.
+In this case we enter the *TRY IT* mode where the user can play Peg Solitaire starting from the given position. While playing the `Check` button can still be used. *TRY IT* mode can be deactivated by pressing the `Stop Trying` button. This returns us to the *SETUP* mode.
