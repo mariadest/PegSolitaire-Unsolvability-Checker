@@ -53,7 +53,7 @@ def find_1d_unsolvability_proof(task):
     """
     Finds a weight function w for the separating function.
     The basic idea is we "mark" cells, i.e. the weight function assigns them a value of 1. Unmarked cells are 0.
-    The goal is to find an assignment of marked cells whose parity proves that the puzzle is unsolvable.
+    The goal is to find an assignment of marked cells whose parity always stays the same but the goal state has a different parity.
     """
     cells = task.board_cells
     n = len(cells)
@@ -101,3 +101,4 @@ def find_1d_unsolvability_proof(task):
         "method": "1d features",
         "marked_cells": marked_cells,
     }
+    

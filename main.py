@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 
 from gui import PegSolitaireGUI
 from game_maker import get_english_board_cells,generate_operators,make_single_peg_goal
@@ -25,7 +24,7 @@ def build_task_from_gui_configuration(initial_state, goal_cell=(3, 3)):
 
 def print_state(task):
     
-    # print out what the board looks like (mainly for debugging, not really needed)
+    # print out what the board looks like (mainly for debugging, not really needed with the GUI)
     for row in range(7):
         line = ""
 
@@ -60,12 +59,6 @@ def handle_gui_check(gui, initial_state):
         print("-----------------------------------------------------")
         
         gui.show_marked_cells(proof_1d["marked_cells"])
-
-        '''messagebox.showinfo(
-            "We found a proof!",
-            "An unsolvability proof was found using one-dimensional features over F2.",
-        )''' 
-        
         gui.status_label.config(text="An unsolvability proof was found using 1D features over F2! \n")
         
     elif proof_resource is not None:
@@ -77,30 +70,14 @@ def handle_gui_check(gui, initial_state):
         print("-----------------------------------------------------")
 
         gui.show_resource_cells(proof_resource["positive_cells"], proof_resource["negative_cells"], proof_resource["weights"])
-        
-        """ messagebox.showinfo(
-            "We found a proof!",
-            "An unsolvability proof was found using resource-count.\n\n"
-            f"Initial resource: {proof_resource['initial_value']:.1f}\n"
-            f"Goal resource: {proof_resource['goal_value']:.1f}",
-        )"""
-        
         gui.status_label.config(text="An unsolvability proof was found using resource count! \n"
                                 f"Initial resource: {proof_resource['initial_value']:.1f}             Goal resource: {proof_resource['goal_value']:.1f}",)
 
     else:
         print("No unsolvability proof was found.")
         print("-----------------------------------------------------")
-
-        '''messagebox.showinfo(
-            "We failed.",
-            "We could not find a proof. \n\n"
-            "Guess you have to try for yourself :)",
-        )'''
-        
         gui.status_label.config(text="We could not find a proof. \n Time to try it out yourself :)")
 
-        
         gui.start_try_it_mode(show_message=False)
     
     
@@ -123,3 +100,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    

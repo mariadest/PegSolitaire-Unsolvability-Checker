@@ -5,8 +5,8 @@ from game_maker import PEG, EMPTY, get_english_board_cells
 
 
 class PegSolitaireGUI:
-    CELL_SIZE = 70      # pixel size of cells
-    PEG_RADIUS = 22     # pixel radius of pegs
+    CELL_SIZE = 70     
+    PEG_RADIUS = 22    
 
     def __init__(self, root, on_check):
         self.root = root   
@@ -27,7 +27,6 @@ class PegSolitaireGUI:
         self.play_mode = False
         self.selected_cell = None
 
-        # the actual 'canvas' where stuff is drawn
         self.canvas = tk.Canvas(
             root,
             width=7 * self.CELL_SIZE,
@@ -53,7 +52,7 @@ class PegSolitaireGUI:
         button_frame = tk.Frame(root)
         button_frame.pack(pady=(0, 20))
 
-        # define the CHECK button
+        # CHECK button
         check_button = tk.Button(
             button_frame,
             text="Check",
@@ -63,7 +62,7 @@ class PegSolitaireGUI:
         )
         check_button.pack(side=tk.LEFT, padx=5)
 
-        # define the RESET button
+        # RESET BOARD button
         reset_button = tk.Button(
             button_frame,
             text="Reset Board",
@@ -73,6 +72,7 @@ class PegSolitaireGUI:
         )
         reset_button.pack(side=tk.LEFT, padx=5)
         
+        # CLEAR BOARD button
         self.clear_button = tk.Button(
             button_frame,
             text="Clear Board",
@@ -83,6 +83,7 @@ class PegSolitaireGUI:
         
         self.clear_button.pack(side=tk.LEFT, padx=5)
         
+        # STOP TRYING button
         self.stop_trying_button = tk.Button(
             button_frame,
             text="Stop Trying",
@@ -458,7 +459,7 @@ class PegSolitaireGUI:
             
     def stop_try_it_mode(self):
         """
-        Returns to regular mode
+        Returns to setup mode
         """
         self.play_mode = False
         self.selected_cell = None
@@ -491,3 +492,4 @@ class PegSolitaireGUI:
         self.status_label.config(text="\n")
         self.disable_stop_trying()
         self.draw_board()
+        

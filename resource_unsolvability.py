@@ -40,15 +40,10 @@ def create_operator_coefficients(operator, index, n):
 def find_resource_unsolvability_proof(task, epsilon=1.0):
     """
     Finds a one-dimensional real-valued resource-count proof.
-
     We look for cell weights w such that:
-
         resource(after) <= resource(before)
-
     for every operator, and:
-
         resource(goal) >= resource(initial) + epsilon
-
     If such weights exist, the goal cannot be reachable from the initial state.
     """
     cells = task.board_cells
@@ -119,3 +114,4 @@ def find_resource_unsolvability_proof(task, epsilon=1.0):
         "initial_value": initial_value,
         "goal_value": goal_value,
     }
+    
